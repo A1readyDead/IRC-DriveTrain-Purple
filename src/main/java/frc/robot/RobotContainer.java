@@ -8,11 +8,14 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.Drive;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.LiftArm;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -22,21 +25,20 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // Challenge: declare and instantiate a Drivetrain object, two Joystick objects, and a Drive oject
-  // for the Joystick constructor, use ports 0 and 1
-  // for the Drive constructor, use the newly instantiated Drivetrain and Joystick objects
-
   /// the robot's subsystems and commands are redefined here...
   private final Drivetrain drivetrain = new Drivetrain();
   private final Joystick leftStick = new Joystick(0);
   private final Joystick rightStick = new Joystick(1);
   private final Drive drive = new Drive(drivetrain, leftStick, rightStick);
+  private final Arm arm = new Arm();
+  private final JoystickButton armUpButton = new JoystickButton(rightStick, 4);
+  private final JoystickButton armDownButton = new JoystickButton(rightStick, 5);
 
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
+  private final CommandXboxController m_driverController = 
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -58,6 +60,11 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // sets the arm to move at 50% speed when the button is pressed
+    // when the button is released the arm will stop
+    // notice the LiftArm constructor can be usd for the parameter
+    armUpButton.whileTrue(new LiftArm(arm, 0.3));
+    armDownButton.whileTrue(new LiftArm(arm, 0.3));
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
